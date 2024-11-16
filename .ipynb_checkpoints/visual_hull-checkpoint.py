@@ -102,12 +102,12 @@ def get_visual_hull(N, bbox, scene_info, cam_center):
         all_pts.append(pts)
 
         # now we have the pts, we need to project them to the image plane
-        # batched projection 
+        # batched projection
         uv, z = batch_projection(Ks, Ts, pts) # [N, 100, 100, 2], [N, 100, 100]
         valid_z_mask = z > 0
         valid_x_y_mask = (uv[...,0] > 0) & (uv[...,0] < cam_info.image_width) & (uv[...,1] > 0) & (uv[...,1] < cam_info.image_height)
         valid_pt_mask = valid_z_mask & valid_x_y_mask
-        
+
         # simple resize the uv to [-1, 1]
         uv[...,0] = uv[...,0] / cam_info.image_width * 2 - 1
         uv[...,1] = uv[...,1] / cam_info.image_height * 2 - 1
@@ -116,8 +116,9 @@ def get_visual_hull(N, bbox, scene_info, cam_center):
         result = F.grid_sample(images.float(), uv, padding_mode='zeros', align_corners=False).permute(0, 2, 3, 1) # N, 100, 100, 3
         # sample mask
         result_mask = F.grid_sample(masks.float(), uv, padding_mode='zeros', align_corners=False).permute(0, 2, 3, 1) # N, 100, 100, 1
-        
-        valid_pt_mask = result_mask.squeeze() > 0 & valid_pt_mask   
+
+        valid_pt_mask = result_mask.squeeze() > 0 & valid_pt_mask
+
         pcs.append(valid_pt_mask.float().sum(0) >= (images.shape[0] - 1)) # [100, 100]
         color.append(result.mean(0)) # [100, 100, 3]
     
@@ -261,7 +262,7 @@ if __name__=="__main__":
         pcdo = o3d.io.read_point_cloud(os.path.join(args.data_dir, "sparse/0/points3D.ply"))
 
         # init viewer
-        # o3d.visualization.webrtc_server.enable_webrtc()
+        o3d.visualization.webrtc_server.enable_webrtc()
         viewer = o3d.visualization.Visualizer()
         viewer.create_window()
         viewer.add_geometry(cameras)

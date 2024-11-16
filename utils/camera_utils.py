@@ -10,17 +10,17 @@
 # GRAPHDECO research group, https://team.inria.fr/graphdeco
 import os
 import math
-from scene.cameras import Camera, Camera_w_pose
+from GaussianObject.scene.cameras import Camera, Camera_w_pose
 import numpy as np
-from utils.general_utils import PILtoTorch
-from utils.graphics_utils import fov2focal
-from utils.sp_tqdm import tqdm
+from GaussianObject.utils.general_utils import PILtoTorch
+from GaussianObject.utils.graphics_utils import fov2focal
+from GaussianObject.utils.sp_tqdm import tqdm
 import torch
 from torch.multiprocessing import Pool
 import cv2
 from typing import NamedTuple, Optional, List, Tuple
 from scipy.special import softmax
-from utils.graphics_utils import getWorld2View2
+from GaussianObject.utils.graphics_utils import getWorld2View2
 
 WARNED = False
 

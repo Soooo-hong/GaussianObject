@@ -19,14 +19,14 @@ import numpy as np
 from PIL import Image
 from plyfile import PlyData, PlyElement
 
-from scene.colmap_loader import (qvec2rotmat, read_extrinsics_binary,
+from GaussianObject.scene.colmap_loader import (qvec2rotmat, read_extrinsics_binary,
                                  read_extrinsics_text, read_intrinsics_binary,
                                  read_intrinsics_text, read_points3D_binary,
                                  read_points3D_text)
-from scene.gaussian_model import BasicPointCloud
-from utils.graphics_utils import focal2fov, getWorld2View2, transform_pcd
-from utils.image_utils import load_meshlab_file
-from utils.camera_utils import transform_cams, CameraInfo, generate_ellipse_path_from_camera_infos
+from GaussianObject.scene.gaussian_model import BasicPointCloud
+from GaussianObject.utils.graphics_utils import focal2fov, getWorld2View2, transform_pcd
+from GaussianObject.utils.image_utils import load_meshlab_file
+from GaussianObject.utils.camera_utils import transform_cams, CameraInfo, generate_ellipse_path_from_camera_infos
 
 
 class SceneInfo(NamedTuple):
@@ -115,7 +115,15 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, extra_opts=
         else:
             mask = None
 
-        mono_depth = None
+        #load detph
+        depth_path_png = osp.join(osp.dirname(images_folder),"zoe_depth_colored",osp.basename(
+            image_path).replace(osp.splitext(osp.basename(image_path))[-1],'.png'))
+        if osp.exists(depth_path_png) and hasattr(extra_opts, "use_depth") and extra_opts.use_depth:
+            mono_depth = cv2.imread(depth_path_png, cv2.IMREAD_GRAYSCALE).astype(np.uint8)
+            mono_depth = mono_depth.astype(np.float32) / 255.0
+        else:
+            mono_depth = None
+        # mono_depth = None
 
         cam_info = CameraInfo(uid=uid, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
                               image_path=image_path, image_name=image_name, 

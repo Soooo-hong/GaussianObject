@@ -12,7 +12,7 @@
 import torch
 from torch import nn
 import numpy as np
-from utils.graphics_utils import getWorld2View2, getProjectionMatrix, getWorld2View2_tensor
+from GaussianObject.utils.graphics_utils import getWorld2View2, getProjectionMatrix, getWorld2View2_tensor
 
 class Camera(nn.Module):
     def __init__(self, colmap_id, R, T, FoVx, FoVy, image, gt_alpha_mask, mono_depth,
