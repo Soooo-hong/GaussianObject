@@ -24,11 +24,11 @@ class Scene:
 
     gaussians : GaussianModel
 
-    def __init__(self, args : ModelParams, gaussians : GaussianModel, load_iteration=None, shuffle=False, resolution_scales=[1.0], extra_opts=None, load_ply=None):
+    def __init__(self, fine_visual_hull, args : ModelParams, gaussians : GaussianModel, load_iteration=None, shuffle=False, resolution_scales=[1.0], extra_opts=None, load_ply=None):
         """b
         :param path: Path to colmap scene main folder.
         """
-        self.model_path = args.model_path # type: ignore
+        self.model_path = '/home/shk00315/capston2/flash3d/data/omni3d/backpack_016' # type: ignore
         self.loaded_iter = None
         self.gaussians = gaussians
 
@@ -42,15 +42,15 @@ class Scene:
         self.train_cameras = {}
         self.test_cameras = {}
         self.render_cameras = {}
-
-        if hasattr(extra_opts, 'use_dust3r') and extra_opts.use_dust3r: # type: ignore
-            scene_info = sceneLoadTypeCallbacks["DUSt3R"](args.source_path, args.images, args.eval, extra_opts=extra_opts) # type: ignore
-        elif os.path.exists(os.path.join(args.source_path, "sparse")): # type: ignore
-            scene_info = sceneLoadTypeCallbacks["Colmap"](args.source_path, args.images, args.eval, extra_opts=extra_opts) # type: ignore
+        
+        # if hasattr(extra_opts, 'use_dust3r') and extra_opts.use_dust3r: # type: ignore
+        #     scene_info = sceneLoadTypeCallbacks["DUSt3R"](args.source_path, args.images, args.eval, extra_opts=extra_opts) # type: ignore
+        if os.path.exists(os.path.join('/home/shk00315/capston2/flash3d/data/omni3d/backpack_016', "sparse")): # type: ignore
+            scene_info = sceneLoadTypeCallbacks["Colmap"]('/home/shk00315/capston2/flash3d/data/omni3d/backpack_016', args.images, args.eval, extra_opts=extra_opts) # type: ignore
         elif os.path.exists(os.path.join(args.source_path, "transforms_alignz_train.json")): # type: ignore
             print("Found transforms_alignz_train.json file, assuming OpenIllumination data set!")
             scene_info = sceneLoadTypeCallbacks["OpenIllumination"](args.source_path, args.white_background, args.eval, extra_opts=extra_opts) # type: ignore
-        else:
+        else: # 위에 해당사항들이 없어서 현재 에러가 발생 
             assert False, "Could not recognize scene type!"
 
         if not self.loaded_iter and load_ply is None:
@@ -93,8 +93,9 @@ class Scene:
             # in this case, we need it to be trainable, so we need to make sure the spatial_lr_scale is not 0
             self.gaussians.spatial_lr_scale = self.cameras_extent
         else:
-            self.gaussians.create_from_pcd(scene_info.point_cloud, self.cameras_extent)
-            self.gaussians.save_ply(os.path.join(self.model_path, "input.ply"))
+            # self.gaussians.create_from_pcd(scene_info.point_cloud, self.cameras_extent)
+            self.gaussians.create_from_pcd(fine_visual_hull, self.cameras_extent) # fine_visual_hull -> [3,20387,3]
+            self.gaussians.save_ply(os.path.join(self.model_path, "input.ply")) # 
 
     def save(self, iteration):
         point_cloud_path = os.path.join(self.model_path, "point_cloud/iteration_{}".format(iteration))

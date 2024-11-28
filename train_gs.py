@@ -22,13 +22,13 @@ import numpy as np
 import torch.nn.functional as F
 from tqdm import tqdm
 from torchmetrics.functional.regression import pearson_corrcoef
-from arguments import ModelParams, OptimizationParams, PipelineParams
-from gaussian_renderer import network_gui
-from scene import GaussianModel, Scene
-from utils.general_utils import safe_state
-from utils.image_utils import psnr
-from utils.loss_utils import l1_loss, ssim, monodisp
-from utils.pose_utils import update_pose, get_loss_tracking
+from GaussianObject.arguments import ModelParams, OptimizationParams, PipelineParams
+from GaussianObject.gaussian_renderer import network_gui
+from GaussianObject.scene import GaussianModel, Scene
+from GaussianObject.utils.general_utils import safe_state
+from GaussianObject.utils.image_utils import psnr
+from GaussianObject.utils.loss_utils import l1_loss, ssim, monodisp
+from GaussianObject.utils.pose_utils import update_pose, get_loss_tracking
 from torch.utils.tensorboard.writer import SummaryWriter
 TENSORBOARD_FOUND = True
 
@@ -309,6 +309,51 @@ def cal_loss(opt, args, image, render_pkg, viewpoint_cam, bg, silhouette_loss_ty
 
     return loss, Ll1
 
+# def train_gs_() : 
+#     parser = ArgumentParser(description="Training script parameters")
+#     lp = ModelParams(parser)
+#     op = OptimizationParams(parser)
+#     pp = PipelineParams(parser)
+
+#     # Create an instance of Namespace
+#     args = Namespace()
+
+#     # Set default values similar to argparse
+#     args.ip = "127.0.0.1"
+#     args.port = 6009
+#     args.debug_from = -1
+#     args.detect_anomaly = False
+#     args.test_iterations = [7000]
+#     args.save_iterations = [7000, 15000]
+#     args.quiet = False
+#     args.checkpoint_iterations = []
+#     args.start_checkpoint = None
+
+#     # Some experimental options
+#     args.sparse_view_num = -1
+#     args.use_mask = True
+#     args.use_dust3r = False
+#     args.dust3r_json = None
+#     args.init_pcd_name = 'origin'
+#     args.transform_the_world = False
+#     args.mono_depth_weight = 0.0005
+#     args.lambda_t_norm = 0.0005
+#     args.mono_loss_type = "mid"
+
+#     # Parse arguments
+#     # Initialize system state (RNG)
+#     safe_state(args.quiet)
+
+#     # Start GUI server, configure and run training
+#     network_gui.init(args.ip, args.port)
+#     torch.autograd.set_detect_anomaly(args.detect_anomaly)
+    
+#     training(args, lp.extract(args), op.extract(args), pp.extract(args), 
+#              args.test_iterations, args.save_iterations, args.checkpoint_iterations, 
+#              args.start_checkpoint, args.debug_from)
+
+#     # All done
+#     print("\nTraining complete.")
 if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")

@@ -12,13 +12,21 @@
 from argparse import ArgumentParser, Namespace
 import sys
 import os
+import yaml 
 
 class GroupParams:
     pass
 
 class ParamGroup:
     def __init__(self, parser: ArgumentParser, name : str, fill_none = False):
-        group = parser.add_argument_group(name)
+        with open('/home/shk00315/capston2/flash3d/configs/config.yaml','r') as yaml_file:
+            self.config = yaml.safe_load(yaml_file)
+        self.config['param']['name'] = [name]
+        
+        with open('/home/shk00315/capston2/flash3d/configs/config.yaml','w') as yaml_file:
+            yaml.dump(self.config,yaml_file,default_flow_style=False)
+       
+        # group = parser.add_argument_group(name)
         for key, value in vars(self).items():
             shorthand = False
             if key.startswith("_"):
@@ -26,22 +34,32 @@ class ParamGroup:
                 key = key[1:]
             t = type(value)
             value = value if not fill_none else None 
-            if shorthand:
-                if t == bool:
-                    group.add_argument("--" + key, ("-" + key[0:1]), default=value, action="store_true")
-                else:
-                    group.add_argument("--" + key, ("-" + key[0:1]), default=value, type=t)
-            else:
-                if t == bool:
-                    group.add_argument("--" + key, default=value, action="store_true")
-                else:
-                    group.add_argument("--" + key, default=value, type=t)
+            self.config['param'][key] = value
+            with open('/home/shk00315/capston2/flash3d/configs/config.yaml','w') as yaml_file:
+                yaml.dump(self.config,yaml_file)
+            # if shorthand:
+            #     if t == bool:
+            #         self.config['param'][key] = value
+            #         # with open('/home/shk00315/capston2/flash3d/configs/config.yaml','w') as yaml_file:
+            #         #     yaml.dump(self.config['param'][key],yaml_file)
+            #         group.add_argument("--" + key, ("-" + key[0:1]), default=value, action="store_true")
+            #     else:
+            #         group.add_argument("--" + key, ("-" + key[0:1]), default=value, type=t)
+            # else:
+            #     if t == bool:
+            #         group.add_argument("--" + key, default=value, action="store_true")
+            #     else:
+            #         group.add_argument("--" + key, default=value, type=t)
 
     def extract(self, args):
         group = GroupParams()
         for arg in vars(args).items():
-            if arg[0] in vars(self) or ("_" + arg[0]) in vars(self):
-                setattr(group, arg[0], arg[1])
+            if arg[0] == '_parent' : 
+                for arg_1 in arg[1].items():
+                    if arg_1[0] == 'param' :
+                        for arg_2 in arg_1[1].items() :  
+                            if arg_2[0] in vars(self) or ("_" + arg_2[0]) in vars(self):
+                                setattr(group, arg_2[0], arg_2[1])
         return group
 
 class ModelParams(ParamGroup): 

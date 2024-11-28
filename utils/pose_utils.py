@@ -1,5 +1,5 @@
 import torch
-from scene.cameras import Camera
+from GaussianObject.scene.cameras import Camera
 
 def skew_sym_mat(x):
     device = x.device

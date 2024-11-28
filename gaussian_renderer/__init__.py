@@ -13,8 +13,8 @@ import torch
 import math
 from diff_gaussian_rasterization import GaussianRasterizationSettings, GaussianRasterizer
 from diff_gaussian_rasterization_w_pose import GaussianRasterizationSettings as GaussianRasterizationSettings_w_pose, GaussianRasterizer as GaussianRasterizer_w_pose
-from scene.gaussian_model import GaussianModel
-from utils.sh_utils import eval_sh
+from GaussianObject.scene.gaussian_model import GaussianModel
+from GaussianObject.utils.sh_utils import eval_sh
 
 def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, scaling_modifier = 1.0, override_color = None):
     """
